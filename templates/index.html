@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>翻訳サポート</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>翻訳サポート</h1>
+      <p>翻訳 → 要約 → 意図解析（質問／依頼／重要度／対応）をまとめて確認できます。</p>
+    </header>
+
+    <!-- 原文入力 -->
+    <section class="card">
+      <form method="post">
+        <label for="text">原文（日本語・英語どちらでも）</label>
+        <textarea
+          id="text"
+          name="text"
+          placeholder="ここに文章を入力、または音声入力してください"
+        ></textarea>
+
+        <div class="actions">
+          <button type="submit" class="btn-translate">翻訳</button>
+
+
+          <!-- 🎤 音声入力：言語切替 -->
+          <button type="button" id="micJaBtn" onclick="startDictation('ja-JP')">🎤 日本語</button>
+          <button type="button" id="micEnBtn" onclick="startDictation('en-US')">🎤 English</button>
+        </div>
+
+        <div class="small">
+          ※ APIキーは .env に保存し、GitHubには含めません。<br>
+          ※ 音声入力は Chrome / Edge 推奨です。
+        </div>
+      </form>
+    </section>
+
+    <!-- 結果表示 -->
+    <section class="grid">
+      <section class="card">
+        <h2 class="section-title">入力内容</h2>
+        <pre>{{ input_text }}</pre>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">翻訳結果</h2>
+        <pre>{{ translation }}</pre>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">要約</h2>
+        <pre>{{ summary }}</pre>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">意図解析</h2>
+        <pre>{{ intent }}</pre>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    // =========================
+    // 🎤 音声入力（SpeechRecognition）日英切替
+    // =========================
+    function startDictation(lang) {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert("このブラウザは音声入力に対応していません。Chrome / Edge をお使いください。");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = lang;          // ★ここで言語を切替
+      recognition.interimResults = true;
+      recognition.continuous = false;
+
+      const textarea = document.getElementById("text");
+      const micJaBtn = document.getElementById("micJaBtn");
+      const micEnBtn = document.getElementById("micEnBtn");
+
+      let finalText = "";
+
+      // ボタン状態
+      micJaBtn.disabled = true;
+      micEnBtn.disabled = true;
+
+      const jaLabel = "🎤 日本語";
+      const enLabel = "🎤 English";
+
+      if (lang === "ja-JP") micJaBtn.textContent = "🎤 日本語（聞き取り中…）";
+      if (lang === "en-US") micEnBtn.textContent = "🎤 English (Listening…)";
+
+      recognition.onresult = (event) => {
+        let interim = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalText += transcript;
+          } else {
+            interim += transcript;
+          }
+        }
+        textarea.value = finalText + interim; // 上書き（追記したいなら言ってください）
+      };
+
+      recognition.onerror = (event) => {
+        alert("音声入力エラー: " + event.error);
+      };
+
+      recognition.onend = () => {
+        micJaBtn.disabled = false;
+        micEnBtn.disabled = false;
+        micJaBtn.textContent = jaLabel;
+        micEnBtn.textContent = enLabel;
+        textarea.focus();
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
+
+
