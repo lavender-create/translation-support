@@ -6,7 +6,9 @@
   --border: #e5e7eb;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -21,6 +23,7 @@ body {
   padding: 0 16px;
 }
 
+/* ヘッダー */
 .header {
   margin-bottom: 16px;
 }
@@ -35,6 +38,7 @@ body {
   color: var(--muted);
 }
 
+/* カード（← 枠はここ） */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -77,7 +81,24 @@ button {
   font-weight: 600;
 }
 
-button:hover { opacity: 0.92; }
+button:hover {
+  opacity: 0.92;
+}
+
+/* 翻訳ボタン（青） */
+.btn-translate {
+  background-color: #1e88e5;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-translate:hover {
+  background-color: #1565c0;
+}
 
 .small {
   color: var(--muted);
@@ -113,20 +134,3 @@ pre {
     grid-template-columns: 1fr 1fr;
   }
 }
-
-/* 翻訳ボタン（青） */
-.btn-translate {
-  background-color: #1e88e5;   /* 青 */
-  color: #ffffff;              /* 文字は白 */
-  border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* マウスを乗せたとき */
-.btn-translate:hover {
-  background-color: #1565c0;   /* 少し濃い青 */
-}
-
